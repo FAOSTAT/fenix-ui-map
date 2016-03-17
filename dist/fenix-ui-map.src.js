@@ -1095,7 +1095,8 @@ FM.Map = FM.Class.extend({
             legendcontrol: true,
         	disclaimerfao: true
         },
-        baselayers: null
+        baselayers: null,
+        addDefaultBaselayers: false
     },
     mapOptions: {
 		zoomControl: false,
@@ -1171,7 +1172,7 @@ FM.Map = FM.Class.extend({
         
         this.initializePlugins();
 
-        if(this.options.baselayers === null) {
+        if(this.options.baselayers === null && this.options.addDefaultBaselayers === true) {
             this.options.baselayers = {
                 'OSM': FM.TILELAYER['OSM'],
                 'OSM_GRAYSCALE': FM.TILELAYER['OSM_GRAYSCALE'],
