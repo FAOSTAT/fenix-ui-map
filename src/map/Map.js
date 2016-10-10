@@ -190,7 +190,9 @@ FM.Map = FM.Class.extend({
 
     addShadedLayer: function(l) {
         // adding the layer to the controller
-        if ( !l.layerAdded) this.controller.layerAdded(l);
+        if ( !l.layerAdded) {
+            this.controller.layerAdded(l);
+        }
         this.createShadeLayerRequest(l, l.isadded);
     },
 
@@ -216,15 +218,17 @@ FM.Map = FM.Class.extend({
     },
 
     _createShadeLayer: function(l, response, isReload){
-        if (typeof response == 'string')
+        if (typeof response == 'string') {
             response = $.parseJSON(response);
+        }
         //l.layer.sldurl = response.sldurl;
         //l.layer.urlWMS = response.geoserverwms;
         l.layer.sldurl = response.url;
         // TODO: check urlWMS how to set it
         l.layer.urlWMS = this.options.url.DEFAULT_WMS_SERVER;
-        if (response.geoserverwms)
+        if (response.geoserverwms) {
             l.layer.urlWMS = response.geoserverwms
+        }
 
         //l.layer.urlWMS = "http://localhost:9090/geoserver/wms/";
         l.layer.legendHTML = response.legendHTML;
@@ -234,6 +238,7 @@ FM.Map = FM.Class.extend({
     },
 
     _loadLayer:function(l, isReload) {
+
         var isReload = ( isReload == null || !isReload )? false: true;
         // TODO: if ( this.map.hasLayer(l.leafletLayer)) could be an alternative to the isReloaded check?
         if ( !isReload ) {

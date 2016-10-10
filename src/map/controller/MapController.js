@@ -20,7 +20,7 @@ FM.MAPController = FM.Class.extend({
 
     layersMap: '',  // HashMap(l.id, l)
 
-    layersMapZIndexes: '', // HashMap(l.zindex, l.id)
+    layersMapZIndexes: '', // HashMap(l.zIndex, l.id)
 
     zIndexBaseLayer: 10, // TODO: modify it automatically on every update/adding of the layer checking the higher
 
@@ -189,8 +189,8 @@ FM.MAPController = FM.Class.extend({
                 for(var i=children.length-1; i >= 0; i-- ) {
                     var id = $(children[i]).data("layer").id;
                     var layertitle = $(children[i]).data( "layer").layer.layertitle;
-                    var zIndex =  zIndexBase + 100
-                    layerIDs.push($(children[i]).data("layer").id)
+                    var zIndex =  zIndexBase + 100;
+                    layerIDs.push($(children[i]).data("layer").id);
                     _this.updateZIndex(id, zIndex);
                     zIndexBase++;
                 }
@@ -212,11 +212,13 @@ FM.MAPController = FM.Class.extend({
 
         l.layerAdded = true;
         /** TODO: check if works always this solution **/
-        if ( !l.layer.zindex ) {
-            l.layer.zindex = this.zIndex;
-            l.leafletLayer.setZIndex = l.layer.zindex;
+        if ( !l.layer.zIndex ) {
+            l.layer.zIndex = this.zIndex;
+            l.leafletLayer.setZIndex = l.layer.zIndex;
         }
         this.zIndex = this.zIndex + 2;
+
+        //console.log("map - this.zIndex", this.zIndex);
 
         if ( !l.layer.hideLayerInControllerList ) {
             // add legend to the mapDIV
@@ -244,7 +246,6 @@ FM.MAPController = FM.Class.extend({
             $(idStructure).prepend(overlayStructure);
 
 
-
             // saving the layer information (it's too many information TODO: please set only ID and needed infos
             $( '#'+ l.id  + '-controller-item-box' ).data( "layer", l );
 
@@ -255,7 +256,7 @@ FM.MAPController = FM.Class.extend({
 
             // setting the layer to the HashMap to handle the ID and ZIndex
             this.layersMap.set(l.id, l);
-            this.layersMapZIndexes.set(l.layer.zindex, l.id)
+            this.layersMapZIndexes.set(l.layer.zIndex, l.id);
 
             // drag and drop layer
             $(idItem).attr( "title", $.i18n.prop('_dragdroplayer'));
@@ -462,12 +463,12 @@ FM.MAPController = FM.Class.extend({
 
         // setting the zIndex and updating it
         //console.log(this.zIndexBaseLayer);
-        l.layer.zindex = this.zIndexBaseLayer;
+        l.layer.zIndex = this.zIndexBaseLayer;
         this.zIndexBaseLayer = this.zIndexBaseLayer + 2;
 
         // setting the layer to the HashMap to handle the ID and ZIndex
         this.baseLayersMap.set(l.id, l);
-        this.layersMapZIndexes.set(l.layer.zindex, l.id);
+        this.layersMapZIndexes.set(l.layer.zIndex, l.id);
 
         // creating the HTML controller-overlay-item structure
         var idStructure =  '#'+ this.suffix + '-controller-baselayer-content',
@@ -557,7 +558,7 @@ FM.MAPController = FM.Class.extend({
         this._map.removeLayer(l.leafletLayer);
         // remove layer from the hashmaps
         this.layersMap.remove(l.id);
-        this.layersMapZIndexes.remove(l.layer.zindex);
+        this.layersMapZIndexes.remove(l.layer.zIndex);
         $('#' + l.id + '-controller-item-box').remove();
         $('#' + l.id + '-controller-item-getlegend-holder').remove();
     },
@@ -572,7 +573,7 @@ FM.MAPController = FM.Class.extend({
             this._map.removeLayer(l.layer.pointsLayers[i]);
 
         this.layersMap.remove(l.id);
-        this.layersMapZIndexes.remove(l.layer.zindex);
+        this.layersMapZIndexes.remove(l.layer.zIndex);
         $('#' + id + '-controller-item-box').remove();
     },
 
@@ -709,6 +710,7 @@ FM.MAPController = FM.Class.extend({
                 // do nothing (this will maintain the old status
             }
             else {
+                console.log("map - showHideLayer", l)
                 if (l.layer.visibility == null || l.layer.visibility) {
                     l.layer.visibility = false;
                     ;
@@ -739,8 +741,8 @@ FM.MAPController = FM.Class.extend({
      */
     updateZIndex: function(layerID, updatedZIndex) {
         var l = this.layersMap.get(layerID);
-        l.layer.zindex = updatedZIndex;
-        l.leafletLayer.setZindex = updatedZIndex;
+        l.layer.zIndex = updatedZIndex;
+        l.leafletLayer.setZIndex(updatedZIndex);
         try {
             document.getElementById(l.id).style.zIndex=updatedZIndex;
         }catch (e) {
@@ -758,12 +760,13 @@ FM.MAPController = FM.Class.extend({
     setZIndex: function (l) {
         try {
             var layers = document.getElementById(this._fenixMap.tilePaneID).childNodes;
-            for (i = 0, len = layers.length; i < len; i++) {
+            for (var i = 0, len = layers.length; i < len; i++) {
                 if (layers[i] !== this._container) {
                     var zIndex = parseInt(layers[i].style.zIndex, 10);
                     if ( isNaN(zIndex))  {
-                        layers[i].style.zIndex = l.layer.zindex;
+                        layers[i].style.zIndex = l.layer.zIndex;
                         layers[i].id = l.id;
+                        l.leafletLayer.setZIndex(l.layer.zIndex);
                     }
                 }
             }
@@ -788,7 +791,7 @@ FM.MAPController = FM.Class.extend({
         /* TODO: make it simpler **/
         var arrayZindex = [];
         this.layersMap.forEach(function(l) {
-            arrayZindex.push(l.layer.zindex)
+            arrayZindex.push(l.layer.zIndex)
         });
         arrayZindex = arrayZindex.sort()
 
@@ -801,7 +804,7 @@ FM.MAPController = FM.Class.extend({
             if ( !found)
                 this.layersMap.forEach(function(l) {
                     //console.log(e);
-                    if (l.layer.zindex == arrayZindex[i]) {
+                    if (l.layer.zIndex == arrayZindex[i]) {
                         arrayLayers.push(l.layer);
                         found = true;
                     }

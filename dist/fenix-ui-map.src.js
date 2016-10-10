@@ -1259,7 +1259,9 @@ FM.Map = FM.Class.extend({
 
     addShadedLayer: function(l) {
         // adding the layer to the controller
-        if ( !l.layerAdded) this.controller.layerAdded(l);
+        if ( !l.layerAdded) {
+            this.controller.layerAdded(l);
+        }
         this.createShadeLayerRequest(l, l.isadded);
     },
 
@@ -1285,15 +1287,17 @@ FM.Map = FM.Class.extend({
     },
 
     _createShadeLayer: function(l, response, isReload){
-        if (typeof response == 'string')
+        if (typeof response == 'string') {
             response = $.parseJSON(response);
+        }
         //l.layer.sldurl = response.sldurl;
         //l.layer.urlWMS = response.geoserverwms;
         l.layer.sldurl = response.url;
         // TODO: check urlWMS how to set it
         l.layer.urlWMS = this.options.url.DEFAULT_WMS_SERVER;
-        if (response.geoserverwms)
+        if (response.geoserverwms) {
             l.layer.urlWMS = response.geoserverwms
+        }
 
         //l.layer.urlWMS = "http://localhost:9090/geoserver/wms/";
         l.layer.legendHTML = response.legendHTML;
@@ -1303,6 +1307,7 @@ FM.Map = FM.Class.extend({
     },
 
     _loadLayer:function(l, isReload) {
+
         var isReload = ( isReload == null || !isReload )? false: true;
         // TODO: if ( this.map.hasLayer(l.leafletLayer)) could be an alternative to the isReloaded check?
         if ( !isReload ) {
@@ -1666,7 +1671,7 @@ FM.MAPController = FM.Class.extend({
 
     layersMap: '',  // HashMap(l.id, l)
 
-    layersMapZIndexes: '', // HashMap(l.zindex, l.id)
+    layersMapZIndexes: '', // HashMap(l.zIndex, l.id)
 
     zIndexBaseLayer: 10, // TODO: modify it automatically on every update/adding of the layer checking the higher
 
@@ -1835,8 +1840,8 @@ FM.MAPController = FM.Class.extend({
                 for(var i=children.length-1; i >= 0; i-- ) {
                     var id = $(children[i]).data("layer").id;
                     var layertitle = $(children[i]).data( "layer").layer.layertitle;
-                    var zIndex =  zIndexBase + 100
-                    layerIDs.push($(children[i]).data("layer").id)
+                    var zIndex =  zIndexBase + 100;
+                    layerIDs.push($(children[i]).data("layer").id);
                     _this.updateZIndex(id, zIndex);
                     zIndexBase++;
                 }
@@ -1858,11 +1863,13 @@ FM.MAPController = FM.Class.extend({
 
         l.layerAdded = true;
         /** TODO: check if works always this solution **/
-        if ( !l.layer.zindex ) {
-            l.layer.zindex = this.zIndex;
-            l.leafletLayer.setZIndex = l.layer.zindex;
+        if ( !l.layer.zIndex ) {
+            l.layer.zIndex = this.zIndex;
+            l.leafletLayer.setZIndex = l.layer.zIndex;
         }
         this.zIndex = this.zIndex + 2;
+
+        //console.log("map - this.zIndex", this.zIndex);
 
         if ( !l.layer.hideLayerInControllerList ) {
             // add legend to the mapDIV
@@ -1890,7 +1897,6 @@ FM.MAPController = FM.Class.extend({
             $(idStructure).prepend(overlayStructure);
 
 
-
             // saving the layer information (it's too many information TODO: please set only ID and needed infos
             $( '#'+ l.id  + '-controller-item-box' ).data( "layer", l );
 
@@ -1901,7 +1907,7 @@ FM.MAPController = FM.Class.extend({
 
             // setting the layer to the HashMap to handle the ID and ZIndex
             this.layersMap.set(l.id, l);
-            this.layersMapZIndexes.set(l.layer.zindex, l.id)
+            this.layersMapZIndexes.set(l.layer.zIndex, l.id);
 
             // drag and drop layer
             $(idItem).attr( "title", $.i18n.prop('_dragdroplayer'));
@@ -2108,12 +2114,12 @@ FM.MAPController = FM.Class.extend({
 
         // setting the zIndex and updating it
         //console.log(this.zIndexBaseLayer);
-        l.layer.zindex = this.zIndexBaseLayer;
+        l.layer.zIndex = this.zIndexBaseLayer;
         this.zIndexBaseLayer = this.zIndexBaseLayer + 2;
 
         // setting the layer to the HashMap to handle the ID and ZIndex
         this.baseLayersMap.set(l.id, l);
-        this.layersMapZIndexes.set(l.layer.zindex, l.id);
+        this.layersMapZIndexes.set(l.layer.zIndex, l.id);
 
         // creating the HTML controller-overlay-item structure
         var idStructure =  '#'+ this.suffix + '-controller-baselayer-content',
@@ -2203,7 +2209,7 @@ FM.MAPController = FM.Class.extend({
         this._map.removeLayer(l.leafletLayer);
         // remove layer from the hashmaps
         this.layersMap.remove(l.id);
-        this.layersMapZIndexes.remove(l.layer.zindex);
+        this.layersMapZIndexes.remove(l.layer.zIndex);
         $('#' + l.id + '-controller-item-box').remove();
         $('#' + l.id + '-controller-item-getlegend-holder').remove();
     },
@@ -2218,7 +2224,7 @@ FM.MAPController = FM.Class.extend({
             this._map.removeLayer(l.layer.pointsLayers[i]);
 
         this.layersMap.remove(l.id);
-        this.layersMapZIndexes.remove(l.layer.zindex);
+        this.layersMapZIndexes.remove(l.layer.zIndex);
         $('#' + id + '-controller-item-box').remove();
     },
 
@@ -2355,6 +2361,7 @@ FM.MAPController = FM.Class.extend({
                 // do nothing (this will maintain the old status
             }
             else {
+                console.log("map - showHideLayer", l)
                 if (l.layer.visibility == null || l.layer.visibility) {
                     l.layer.visibility = false;
                     ;
@@ -2385,8 +2392,8 @@ FM.MAPController = FM.Class.extend({
      */
     updateZIndex: function(layerID, updatedZIndex) {
         var l = this.layersMap.get(layerID);
-        l.layer.zindex = updatedZIndex;
-        l.leafletLayer.setZindex = updatedZIndex;
+        l.layer.zIndex = updatedZIndex;
+        l.leafletLayer.setZIndex(updatedZIndex);
         try {
             document.getElementById(l.id).style.zIndex=updatedZIndex;
         }catch (e) {
@@ -2404,12 +2411,13 @@ FM.MAPController = FM.Class.extend({
     setZIndex: function (l) {
         try {
             var layers = document.getElementById(this._fenixMap.tilePaneID).childNodes;
-            for (i = 0, len = layers.length; i < len; i++) {
+            for (var i = 0, len = layers.length; i < len; i++) {
                 if (layers[i] !== this._container) {
                     var zIndex = parseInt(layers[i].style.zIndex, 10);
                     if ( isNaN(zIndex))  {
-                        layers[i].style.zIndex = l.layer.zindex;
+                        layers[i].style.zIndex = l.layer.zIndex;
                         layers[i].id = l.id;
+                        l.leafletLayer.setZIndex(l.layer.zIndex);
                     }
                 }
             }
@@ -2434,7 +2442,7 @@ FM.MAPController = FM.Class.extend({
         /* TODO: make it simpler **/
         var arrayZindex = [];
         this.layersMap.forEach(function(l) {
-            arrayZindex.push(l.layer.zindex)
+            arrayZindex.push(l.layer.zIndex)
         });
         arrayZindex = arrayZindex.sort()
 
@@ -2447,7 +2455,7 @@ FM.MAPController = FM.Class.extend({
             if ( !found)
                 this.layersMap.forEach(function(l) {
                     //console.log(e);
-                    if (l.layer.zindex == arrayZindex[i]) {
+                    if (l.layer.zIndex == arrayZindex[i]) {
                         arrayLayers.push(l.layer);
                         found = true;
                     }
@@ -3580,7 +3588,7 @@ FM.Layer = FM.Class.extend({
         opacity: 1,
         // Other Options
         name: '',
-        tiitle: '',
+        title: '',
         abstract: '',
         srs: '',
         LatLonBoundingBox: '',
@@ -3614,26 +3622,37 @@ FM.Layer = FM.Class.extend({
     initialize: function(layer, options) { // (HTMLElement or String, Object)
         this.layer = $.extend(true, {}, this.layer, layer);
 
-        if (options)
+        if (options) {
             this.options = options;
+        }
+
+        // TODO: handle wrong zindex name
+        if (this.layer.zindex) {
+            this.layer.zIndex = this.layer.zindex;
+        }
+
+        //console.log("map - Layer.initialize", this.layer);
 
         this.id = FM.Util.randomID();
 
-        if (layer.joindata)
+        if (layer.joindata) {
             layer.defaultdata = layer.joindata;
+        }
     },
 
     createLayerWMS: function() {
 
         var wmsParameters = this._getWMSParameters();
         if ( this.leafletLayer ) {
-            if(this.layertype === 'WMS')
+            if(this.layertype === 'WMS') {
                 this.leafletLayer.setParams(wmsParameters);
+            }
         }
         else {
             wmsParameters = (this.options)? $.extend(true, {}, this.options, wmsParameters): wmsParameters;
             this.leafletLayer = new L.TileLayer.WMS( this.layer.urlWMS, wmsParameters );
         }
+        this.leafletLayer.setZIndex(this.layer.zIndex);
         return this.leafletLayer;
     },
 
@@ -3645,6 +3664,7 @@ FM.Layer = FM.Class.extend({
         else {
             this.leafletLayer = new L.TileLayer.WMS( this.layer.urlWMS, wmsParameters );
         }
+        this.leafletLayer.setZIndex(this.layer.zIndex);
         return this.leafletLayer;
     },
 
@@ -3725,10 +3745,12 @@ FM.Layer = FM.Class.extend({
     },
 
     addLayer: function(fenixmap) {
-        if ( fenixmap )
+        if ( fenixmap ) {
             fenixmap.addLayer(this);
-        else if ( this._fenixmap)
+        }
+        else if ( this._fenixmap) {
             this._fenixmap.addLayer(this);
+        }
     },
 
     addShadedLayer: function(fenixmap) {

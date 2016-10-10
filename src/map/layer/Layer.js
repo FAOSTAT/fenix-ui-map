@@ -16,7 +16,7 @@ FM.Layer = FM.Class.extend({
         opacity: 1,
         // Other Options
         name: '',
-        tiitle: '',
+        title: '',
         abstract: '',
         srs: '',
         LatLonBoundingBox: '',
@@ -50,26 +50,37 @@ FM.Layer = FM.Class.extend({
     initialize: function(layer, options) { // (HTMLElement or String, Object)
         this.layer = $.extend(true, {}, this.layer, layer);
 
-        if (options)
+        if (options) {
             this.options = options;
+        }
+
+        // TODO: handle wrong zindex name
+        if (this.layer.zindex) {
+            this.layer.zIndex = this.layer.zindex;
+        }
+
+        //console.log("map - Layer.initialize", this.layer);
 
         this.id = FM.Util.randomID();
 
-        if (layer.joindata)
+        if (layer.joindata) {
             layer.defaultdata = layer.joindata;
+        }
     },
 
     createLayerWMS: function() {
 
         var wmsParameters = this._getWMSParameters();
         if ( this.leafletLayer ) {
-            if(this.layertype === 'WMS')
+            if(this.layertype === 'WMS') {
                 this.leafletLayer.setParams(wmsParameters);
+            }
         }
         else {
             wmsParameters = (this.options)? $.extend(true, {}, this.options, wmsParameters): wmsParameters;
             this.leafletLayer = new L.TileLayer.WMS( this.layer.urlWMS, wmsParameters );
         }
+        this.leafletLayer.setZIndex(this.layer.zIndex);
         return this.leafletLayer;
     },
 
@@ -81,6 +92,7 @@ FM.Layer = FM.Class.extend({
         else {
             this.leafletLayer = new L.TileLayer.WMS( this.layer.urlWMS, wmsParameters );
         }
+        this.leafletLayer.setZIndex(this.layer.zIndex);
         return this.leafletLayer;
     },
 
@@ -161,10 +173,12 @@ FM.Layer = FM.Class.extend({
     },
 
     addLayer: function(fenixmap) {
-        if ( fenixmap )
+        if ( fenixmap ) {
             fenixmap.addLayer(this);
-        else if ( this._fenixmap)
+        }
+        else if ( this._fenixmap) {
             this._fenixmap.addLayer(this);
+        }
     },
 
     addShadedLayer: function(fenixmap) {

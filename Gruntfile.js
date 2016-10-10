@@ -164,7 +164,7 @@ grunt.registerTask('default', [
 	//'jshint',
 	'clean',
 	'concat:fenixmap',
-	'uglify',	
+	'uglify:fenixmap',
 	'cssmin',
 	'jsonlint',	
 	'copy'
